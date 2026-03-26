@@ -9,6 +9,13 @@ app.use(cors());
 
 app.use(e.json())
 app.use("/auth",routerAuth)
+app.get('/api/message',(req,res)=>{
+
+    return res.json({text:"helloe bitikoye ke back end neng yene mist"})
+
+
+
+})
 
 app.listen(port,()=>{
     console.log(port)

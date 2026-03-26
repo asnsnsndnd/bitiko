@@ -30,3 +30,7 @@ export const verificationCodeValidation=z.object({
   inputCode:z.string().min(6,{message:"code lenght must 6 digit"})
 
 })
+export const LoginValidation=z.object({
+  email:z.string().email(),
+  password:z.string()
+})

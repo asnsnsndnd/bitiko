@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { create } from "domain";
 import { SendMail } from "../middleware/sendVerficationCode.js";
 import jwt from "jsonwebtoken";
+import { json, safeParse } from "zod";
 
   const prisma= new PrismaClient()
 
@@ -12,21 +13,23 @@ import jwt from "jsonwebtoken";
 export const SignUp=async(req,res)=>{
 
    const {email,password,role,businessName,description,address,bussType }=req.body
+    let createdRecordId=null
 try{
+ 
 
 const result= SignupValidation.safeParse(req.body)
 if(!result.success) return res.status(400).json({msg:result.error.flatten().fieldErrors,ok:false});
-
 const emailFound=await prisma.user.findUnique({where:{email}})
 if(emailFound) return res.status(400).json({msg:"email is already register",ok:false})
 
 const rawcode=crypto.randomInt(100000,9999999).toString();
 
-
+ console.log(req.body)
 let salt=await bcrypt.genSalt(10)
 const hashcode=await bcrypt.hash(rawcode,salt)
 const hashPassword=await bcrypt.hash(password,salt)
 let userResult=await prisma.$transaction(async(tx)=>{
+
 let user
 if(role==="SELLER"){
 
@@ -40,7 +43,7 @@ return user
 
 
 })
-createdRecordId=userResult.id
+ createdRecordId=userResult.id
  await SendMail(userResult.email,rawcode)
 
 return res.status(201).json({msg:"scfuuly account  account create verify your email",ok:true,email:userResult.email})
@@ -129,3 +132,29 @@ export const ReSendCode=async(req,res)=>{
 
 
 }
+// export const login=async(req,res)=>{
+
+//        const {email,password}=req.body
+//        const result=LoginValidation.safeParse(req.body)
+
+//      if(!result.success) return res.status(400).json({msg:result.error.flatten().fieldErrors,ok:false});
+//      const emailFound=await prisma.user.findUnique({where:{email}});
+
+//      if(!emailFound) return res.status(400).json({msg:"email not found",ok:false})
+
+//       const match=bcrypt.compare(password,emailFound.password);
+
+//       if(!match) return stausw
+
+
+
+      
+
+
+
+       
+
+
+
+
+// }
