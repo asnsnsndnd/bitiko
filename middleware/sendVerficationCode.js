@@ -4,20 +4,22 @@ configDotenv();
 
 export const SendMail = async (userEmail, code) => {
   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // ለ 587 የግድ false መሆን አለበት
-  family: 4,
+  // ቀጥታ የ IPv4 አድራሻ በመጠቀም IPv6ን መዝለል ይቻላል
+  host: "74.125.136.108", // ይህ የ smtp.gmail.com IPv4 አድራሻ ነው
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.Email_user,
     pass: process.env.EMail_pass
   },
   tls: {
+    //
     rejectUnauthorized: false,
-    minVersion: "TLSv1.2" // Render ላይ ግንኙነቱ እንዳይቋረጥ ይረዳል
+    servername: 'smtp.gmail.com' 
   }
+});
 
-  });
+ 
 
   const mailOption = {
     from: `"Ethio Store" <${process.env.Email_user}>`, // Format: "Name" <email@gmail.com>
