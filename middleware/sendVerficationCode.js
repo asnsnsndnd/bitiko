@@ -4,20 +4,19 @@ configDotenv();
 
 export const SendMail = async (userEmail, code) => {
   const transporter = nodemailer.createTransport({
-    // Using host instead of "service" gives you more control over the connection
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, 
-    // Force IPv4 to prevent the ECONNREFUSED (2a00:1450...) error
-    family: 4, 
-    auth: {
-      user: process.env.Email_user,
-      pass: process.env.EMail_pass
-    },
-    // Optional: Only use this if you still get "self-signed certificate" errors
-    tls: {
-      rejectUnauthorized: false
-    }
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // ለ 587 የግድ false መሆን አለበት
+  family: 4,
+  auth: {
+    user: process.env.Email_user,
+    pass: process.env.EMail_pass
+  },
+  tls: {
+    rejectUnauthorized: false,
+    minVersion: "TLSv1.2" // Render ላይ ግንኙነቱ እንዳይቋረጥ ይረዳል
+  }
+
   });
 
   const mailOption = {
