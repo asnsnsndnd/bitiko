@@ -132,19 +132,27 @@ export const ReSendCode=async(req,res)=>{
 
 
 }
-// export const login=async(req,res)=>{
+export const login=async(req,res)=>{
 
-//        const {email,password}=req.body
-//        const result=LoginValidation.safeParse(req.body)
+       const {email,password}=req.body
+       const result=LoginValidation.safeParse(req.body)
 
-//      if(!result.success) return res.status(400).json({msg:result.error.flatten().fieldErrors,ok:false});
-//      const emailFound=await prisma.user.findUnique({where:{email}});
+     if(!result.success) return res.status(400).json({msg:result.error.flatten().fieldErrors,ok:false});
+     const emailFound=await prisma.user.findUnique({where:{email}});
 
-//      if(!emailFound) return res.status(400).json({msg:"email not found",ok:false})
+     if(!emailFound) return res.status(401).json({msg:"email not found",ok:false})
 
-//       const match=bcrypt.compare(password,emailFound.password);
+      const match=bcrypt.compare(password,emailFound.password);
 
-//       if(!match) return stausw
+      if(!match) return res.status(401).json({msg:"password not correct",ok:false})
+         if(!emailFound.isVerified) return res.status(402).json({msg:"please verify your emial we sent code into your email",ok:true,email:emailFound.email})
+    const payload={id:emailFound.id,role:emailFound.role}
+         const token=jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            {expiresIn:"1d"}
+         )
+         return res.status(200).json({msg:"succfully login",ok:true,token,user:{email:emailFound.email,role:emailFound.role}})
 
 
 
@@ -157,4 +165,4 @@ export const ReSendCode=async(req,res)=>{
 
 
 
-// }
+}
