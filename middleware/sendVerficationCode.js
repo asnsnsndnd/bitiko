@@ -1,29 +1,40 @@
-export const SendMail = async (userEmail, code) => {
-  return new Promise((resolve, reject) => { // አዲሱ አወቃቀር
+import nodemailer from "nodemailer";
+import { configDotenv } from "dotenv";
+configDotenv();
+
+export const SendMail = (userEmail, code) => {
+  return new Promise((resolve, reject) => {
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: "74.125.136.108", // IPv4 address of smtp.gmail.com
       port: 465,
       secure: true,
       auth: {
-        user: process.env.Email_user,
-        pass: process.env.EMail_pass
+        // በ Render Dashboard ላይ ያሉት ስሞች Case-sensitive መሆናቸውን አረጋግጥ
+        user: process.env.Email_user, 
+        pass: process.env.EMail_pass  // እዚህ ጋር የግድ 16 ዲጂት App Password ተጠቀም
+      },
+      tls: {
+        rejectUnauthorized: false,
+        servername: 'smtp.gmail.com'
       }
     });
 
     const mailOption = {
-      from: process.env.Email_user,
+      from: `"Ethio Store" <${process.env.Email_user}>`,
       to: userEmail,
-      subject: "Verification Code",
-      text: `Your code is ${code}`
+      subject: "Ethio Store Verification Code",
+      text: `Your code is ${code}. It expires in 10 minutes.`,
+      html: `<b>Your verification code is: ${code}</b>`
     };
 
-    transporter.sendMail(mailOption, (err, info) => {
-      if (err) {
-        console.error("Mail Error:", err);
-        return reject(err); 
+    // በ Callback መልክ መጠቀም በ Production ላይ ስህተትን ይቀንሳል
+    transporter.sendMail(mailOption, (error, info) => {
+      if (error) {
+        console.error("Mail Error:", error);
+        return reject(error);
       }
-      console.log("Email sent:", info.response);
-      resolve(info); 
+      console.log("Email sent: " + info.response);
+      resolve(info);
     });
   });
 };
