@@ -33,4 +33,4 @@ export const verificationCodeValidation=z.object({
 export const LoginValidation=z.object({
   email:z.string().email(),
   password:z.string()
-})
+})  
